@@ -33,7 +33,9 @@ public class IngredientBaseListFactory {
 
 	}
 
-	public static ImmutableList<IIngredientListElement> create(IIngredientRegistry ingredientRegistry, JeiHelpers jeiHelpers) {
+	public static ImmutableList<IIngredientListElement> create() {
+		IIngredientRegistry ingredientRegistry = Internal.getIngredientRegistry();
+		JeiHelpers jeiHelpers = Internal.getHelpers();
 		IngredientChecker ingredientChecker = new IngredientChecker(jeiHelpers);
 
 		List<IIngredientListElement> ingredientListElements = new LinkedList<IIngredientListElement>();

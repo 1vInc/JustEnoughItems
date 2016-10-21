@@ -105,6 +105,11 @@ public class ProxyCommonClient extends ProxyCommon {
 				restartJEI();
 			}
 		});
+
+		long jeiStartTime = System.currentTimeMillis();
+		Log.info("Beginning postInit...");
+		JeiStarter.postInit(this.plugins);
+		Log.info("Finished postInit in {} ms", System.currentTimeMillis() - jeiStartTime);
 	}
 
 	@SubscribeEvent
@@ -120,7 +125,7 @@ public class ProxyCommonClient extends ProxyCommon {
 
 	private void startJEI() {
 		long jeiStartTime = System.currentTimeMillis();
-		Log.info("Beginning startup...");
+		Log.info("Beginning runtime startup...");
 		SessionData.setJeiStarted();
 
 		Config.startJei();
@@ -134,7 +139,12 @@ public class ProxyCommonClient extends ProxyCommon {
 		guiEventHandler = new GuiEventHandler(jeiRuntime);
 		MinecraftForge.EVENT_BUS.register(guiEventHandler);
 
-		Log.info("Finished startup in {} ms", System.currentTimeMillis() - jeiStartTime);
+		long elapsedTime = System.currentTimeMillis() - jeiStartTime;
+		Log.info("Finished runtime startup in {} ms", elapsedTime);
+
+		if (elapsedTime > 30000) {
+			Log.error("JEI Startup time was extremely slow and may cause issues connecting to servers. Please report to https://github.com/mezz/JustEnoughItems/issues");
+		}
 	}
 
 	@Override
@@ -151,9 +161,7 @@ public class ProxyCommonClient extends ProxyCommon {
 			if (runtime != null) {
 				ItemListOverlay itemListOverlay = runtime.getItemListOverlay();
 				ItemFilter itemFilter = itemListOverlay.getItemFilter();
-				IIngredientRegistry ingredientRegistry = Internal.getIngredientRegistry();
-				JeiHelpers helpers = Internal.getHelpers();
-				itemFilter.build(ingredientRegistry, helpers);
+				itemFilter.build();
 			}
 		}
 	}
